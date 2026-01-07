@@ -51,7 +51,7 @@ jobs:
           docker build -t python-app:${{ matrix.python-version }} .
 
   deploy:
-    needs: build-test
+    needs: docker-build
 
     runs-on: ubuntu-latest
 
@@ -77,4 +77,14 @@ jobs:
     - name: Health check
       run: |
         echo "Checking application health..."
+
+    - name: Send deployment status to Prometheus
+      if: github.ref == 'refs/heads/main'
+      env:
+        PUSHGATEWAY_URL: ${{ secrets.PUSHGATEWAY_URL }}
+        SERVICE_NAME: python-app
+      run: |
+        STATUS=1
+        echo "deployment_status{service=\"$SERVICE_NAME\"} $STATUS" | \
+        curl --data-binary @- $PUSHGATEWAY_URL/metrics/job/$SERVICE_NAME
 
