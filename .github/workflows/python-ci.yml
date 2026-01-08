@@ -81,7 +81,7 @@ jobs:
     - name: Send deployment status to Prometheus
       if: github.ref == 'refs/heads/main'
       env:
-        PUSHGATEWAY_URL: ${{ secrets.PUSHGATEWAY_URL }}
+        PUSHGATEWAY_URL: http://192.168.1.7:9090
         SERVICE_NAME: python-app
       run: |
         STATUS=1
